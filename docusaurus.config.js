@@ -27,11 +27,6 @@ const config = {
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
-
   onBrokenLinks: 'throw',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -54,8 +49,7 @@ const config = {
           routeBasePath: 'docs',
           sidebarPath: './sidebars.js',
           showLastUpdateTime: true,
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: 'https://github.com/JakeWang-jw/jw-world/edit/main/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -86,7 +80,7 @@ const config = {
             position: 'left',
           },
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/JakeWang-jw/jw-world',
             label: 'GitHub',
             position: 'right',
           },
