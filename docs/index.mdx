@@ -1,0 +1,137 @@
+---
+slug: /
+title: 笔记首页
+sidebar_position: 0
+---
+
+import Link from '@docusaurus/Link';
+import useGlobalData from '@docusaurus/useGlobalData';
+
+# 📚 技术笔记
+
+欢迎来到我的技术笔记！这里记录了我在嵌入式开发、音视频技术等领域的学习心得。
+
+## 笔记分类
+
+export const CategoryList = () => {
+  const globalData = useGlobalData();
+  const docsData = globalData?.['docusaurus-plugin-content-docs']?.default;
+  const version = docsData?.versions?.[0];
+  
+  // 尝试从多个可能的数据源获取文档
+  let allDocs = version?.docs;
+  
+  // 调试：在控制台打印数据结构
+  console.log('Version data:', version);
+  console.log('All docs:', allDocs);
+  
+  // 如果 docs 是数组
+  if (Array.isArray(allDocs)) {
+    const categories = {};
+    allDocs.forEach((doc) => {
+      const docId = doc.id || doc.docId || '';
+      if (docId === 'index') return;
+      
+      const parts = docId.split('/');
+      if (parts.length > 1) {
+        const categoryName = parts[0];
+        if (!categories[categoryName]) {
+          categories[categoryName] = {
+            name: categoryName,
+            docs: [],
+            firstDocPath: doc.path,
+          };
+        }
+        categories[categoryName].docs.push(doc);
+      }
+    });
+    
+    const categoryList = Object.values(categories);
+    if (categoryList.length > 0) {
+      return (
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem'}}>
+          {categoryList.map((category, idx) => (
+            <Link
+              key={idx}
+              to={category.firstDocPath}
+              style={{
+                display: 'block',
+                padding: '1.5rem',
+                borderRadius: '8px',
+                border: '1px solid var(--ifm-color-emphasis-300)',
+                textDecoration: 'none',
+              }}
+            >
+              <h3 style={{margin: 0, marginBottom: '0.5rem'}}>📁 {category.name}</h3>
+              <p style={{margin: 0, color: 'var(--ifm-color-emphasis-600)', fontSize: '0.9rem'}}>
+                {category.docs.length} 篇文档
+              </p>
+            </Link>
+          ))}
+        </div>
+      );
+    }
+  }
+  
+  // 如果 docs 是对象
+  if (allDocs && typeof allDocs === 'object' && !Array.isArray(allDocs)) {
+    const categories = {};
+    Object.entries(allDocs).forEach(([docId, doc]) => {
+      if (docId === 'index') return;
+      
+      const parts = docId.split('/');
+      if (parts.length > 1) {
+        const categoryName = parts[0];
+        if (!categories[categoryName]) {
+          categories[categoryName] = {
+            name: categoryName,
+            docs: [],
+            firstDocPath: doc.path,
+          };
+        }
+        categories[categoryName].docs.push(doc);
+      }
+    });
+    
+    const categoryList = Object.values(categories);
+    if (categoryList.length > 0) {
+      return (
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem'}}>
+          {categoryList.map((category, idx) => (
+            <Link
+              key={idx}
+              to={category.firstDocPath}
+              style={{
+                display: 'block',
+                padding: '1.5rem',
+                borderRadius: '8px',
+                border: '1px solid var(--ifm-color-emphasis-300)',
+                textDecoration: 'none',
+              }}
+            >
+              <h3 style={{margin: 0, marginBottom: '0.5rem'}}>📁 {category.name}</h3>
+              <p style={{margin: 0, color: 'var(--ifm-color-emphasis-600)', fontSize: '0.9rem'}}>
+                {category.docs.length} 篇文档
+              </p>
+            </Link>
+          ))}
+        </div>
+      );
+    }
+  }
+  
+  // 如果上面都没有成功，显示调试信息
+  return (
+    <div>
+      <p>正在加载分类...</p>
+      <details>
+        <summary>调试信息（点击展开）</summary>
+        <pre style={{fontSize: '0.75rem', overflow: 'auto'}}>
+          {JSON.stringify({docsData, version, allDocs}, null, 2)}
+        </pre>
+      </details>
+    </div>
+  );
+};
+
+<CategoryList />
