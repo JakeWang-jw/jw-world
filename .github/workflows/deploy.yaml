@@ -47,7 +47,7 @@ jobs:
 
       # 6. 部署到云服务器
       - name: Deploy to Cloud
-        uses: easingthemes/ssh-deploy@v5
+        uses: easingthemes/ssh-deploy@v4
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH 私钥
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}          # 服务器 IP 或域名
