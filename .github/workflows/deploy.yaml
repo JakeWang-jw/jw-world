@@ -1,0 +1,59 @@
+# GitHub Actions 工作流：自动构建并部署到云服务器
+name: Deploy to Cloud
+
+# 触发条件
+on:
+  push:
+    branches: [main]  # 当 main 分支有推送时触发
+  workflow_dispatch:  # 允许手动触发部署
+
+# 并发控制：同一时间只允许一个部署任务运行
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整 git 历史（用于 showLastUpdateTime）
+
+      # 2. 安装 pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      # 3. 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # 4. 安装项目依赖
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 5. 构建网站
+      - name: Build website
+        run: pnpm build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      # 6. 部署到云服务器
+      - name: Deploy to Cloud
+        uses: easingthemes/ssh-deploy@v5
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH 私钥
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}          # 服务器 IP 或域名
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}          # SSH 用户名（如 root）
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}          # SSH 端口（默认 22）
+          SOURCE: build/                                    # 本地构建目录
+          TARGET: ${{ secrets.REMOTE_TARGET }}             # 服务器目标目录
+          EXCLUDE: ".git, .github"                         # 排除的文件
+          ARGS: "-avzr --delete"                           # rsync 参数
