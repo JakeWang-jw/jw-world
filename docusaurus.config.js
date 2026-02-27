@@ -98,7 +98,7 @@ const config = {
 
   stylesheets: [
     {
-      href: '/katex/katex.min.css',
+      href: '/katex.min.css',
       type: 'text/css',
     },
   ],
