@@ -5,6 +5,7 @@ sidebar_position: 0
 ---
 
 import Link from '@docusaurus/Link';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import useGlobalData from '@docusaurus/useGlobalData';
 
 # 📚 技术笔记
@@ -17,17 +18,12 @@ export const CategoryList = () => {
   const globalData = useGlobalData();
   const docsData = globalData?.['docusaurus-plugin-content-docs']?.default;
   const version = docsData?.versions?.[0];
+  const allDocs = version?.docs;
   
-  // 尝试从多个可能的数据源获取文档
-  let allDocs = version?.docs;
+  const categories = {};
   
-  // 调试：在控制台打印数据结构
-  console.log('Version data:', version);
-  console.log('All docs:', allDocs);
-  
-  // 如果 docs 是数组
+  // 处理数组格式
   if (Array.isArray(allDocs)) {
-    const categories = {};
     allDocs.forEach((doc) => {
       const docId = doc.id || doc.docId || '';
       if (docId === 'index') return;
@@ -45,37 +41,10 @@ export const CategoryList = () => {
         categories[categoryName].docs.push(doc);
       }
     });
-    
-    const categoryList = Object.values(categories);
-    if (categoryList.length > 0) {
-      return (
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem'}}>
-          {categoryList.map((category, idx) => (
-            <Link
-              key={idx}
-              to={category.firstDocPath}
-              style={{
-                display: 'block',
-                padding: '1.5rem',
-                borderRadius: '8px',
-                border: '1px solid var(--ifm-color-emphasis-300)',
-                textDecoration: 'none',
-              }}
-            >
-              <h3 style={{margin: 0, marginBottom: '0.5rem'}}>📁 {category.name}</h3>
-              <p style={{margin: 0, color: 'var(--ifm-color-emphasis-600)', fontSize: '0.9rem'}}>
-                {category.docs.length} 篇文档
-              </p>
-            </Link>
-          ))}
-        </div>
-      );
-    }
   }
   
-  // 如果 docs 是对象
+  // 处理对象格式
   if (allDocs && typeof allDocs === 'object' && !Array.isArray(allDocs)) {
-    const categories = {};
     Object.entries(allDocs).forEach(([docId, doc]) => {
       if (docId === 'index') return;
       
@@ -92,46 +61,38 @@ export const CategoryList = () => {
         categories[categoryName].docs.push(doc);
       }
     });
-    
-    const categoryList = Object.values(categories);
-    if (categoryList.length > 0) {
-      return (
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem'}}>
-          {categoryList.map((category, idx) => (
-            <Link
-              key={idx}
-              to={category.firstDocPath}
-              style={{
-                display: 'block',
-                padding: '1.5rem',
-                borderRadius: '8px',
-                border: '1px solid var(--ifm-color-emphasis-300)',
-                textDecoration: 'none',
-              }}
-            >
-              <h3 style={{margin: 0, marginBottom: '0.5rem'}}>📁 {category.name}</h3>
-              <p style={{margin: 0, color: 'var(--ifm-color-emphasis-600)', fontSize: '0.9rem'}}>
-                {category.docs.length} 篇文档
-              </p>
-            </Link>
-          ))}
-        </div>
-      );
-    }
   }
   
-  // 如果上面都没有成功，显示调试信息
+  const categoryList = Object.values(categories);
+  
+  if (categoryList.length === 0) {
+    return <p>暂无笔记分类</p>;
+  }
+  
   return (
-    <div>
-      <p>正在加载分类...</p>
-      <details>
-        <summary>调试信息（点击展开）</summary>
-        <pre style={{fontSize: '0.75rem', overflow: 'auto'}}>
-          {JSON.stringify({docsData, version, allDocs}, null, 2)}
-        </pre>
-      </details>
+    <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem'}}>
+      {categoryList.map((category, idx) => (
+        <Link
+          key={idx}
+          to={category.firstDocPath}
+          style={{
+            display: 'block',
+            padding: '1.5rem',
+            borderRadius: '8px',
+            border: '1px solid var(--ifm-color-emphasis-300)',
+            textDecoration: 'none',
+          }}
+        >
+          <h3 style={{margin: 0, marginBottom: '0.5rem'}}>📁 {category.name}</h3>
+          <p style={{margin: 0, color: 'var(--ifm-color-emphasis-600)', fontSize: '0.9rem'}}>
+            {category.docs.length} 篇文档
+          </p>
+        </Link>
+      ))}
     </div>
   );
 };
 
-<CategoryList />
+<BrowserOnly fallback={<p>加载中...</p>}>
+  {() => <CategoryList />}
+</BrowserOnly>
