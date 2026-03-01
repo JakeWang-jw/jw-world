@@ -13,6 +13,12 @@ import rehypeKatex from 'rehype-katex';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'JW\'s blog',
+  
+  // 启用 Mermaid 图表支持
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
   tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
 
